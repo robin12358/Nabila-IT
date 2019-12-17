@@ -35,12 +35,18 @@
                     <td>{{$value->trainer_name}}</td>
                     <td>{{$value->course_type}}</td>
                        <td>@if($value->status == 1 )
-                      <a type="button" href="{{-- {{route('admin.slider.status',$value->slider_id)}} --}}" class="btn btn-info">Active</a>
+                      <a type="button" href="{{route('admin.course.status',$value->course_id)}}" class="btn btn-info">Active</a>
                       @else
-                      <a type="button" href="{{-- {{route('admin.slider.status',$value->slider_id)}} --}}" class="btn btn-warning">Unactive</a>
+                      <a type="button" href="{{route('admin.course.status',$value->course_id)}}" class="btn btn-warning">Unactive</a>
             @endif</td>
                     <td class="button-td">
-                        <div class="row"> <div class="ml-2" >
+                        <div class="row">
+                         <div class="ml-2" >
+                             {{Form::open(['url'=>"/coursview/$value->course_id",'method'=>'GET'])}}
+                                            <button  class="button btn btn-success ml-3"><i class="far fa-eye"></i></button>
+                                            {{Form::close()}}
+                                          </div>
+                                            <div class="ml-2" >
                                             {{Form::open(['url'=>"/coursedel/$value->course_id",'method'=>'GET'])}}
                                             <button onclick="return confirm('Are you sure?')" class="button btn btn-danger"><i class="far fa-trash-alt"></i></button>
                                             {{Form::close()}}

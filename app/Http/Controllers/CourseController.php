@@ -60,7 +60,7 @@ class CourseController extends Controller
          $insert_data=new Course;
         $requested_data=$request->all();
          $validation = Validator::make($request->all(),[
-            'title' => 'required|max:30',
+            'title' => 'required|max:80',
             'details' => 'required',
             'subject_name' => 'required',
             'course_type' => 'required',
@@ -98,6 +98,13 @@ class CourseController extends Controller
             return Redirect::to('/allcourse');
         }
       }
+      public function coursview($id){
+        $data['value']= Course::where('course_id',$id)->first();
+        $data['subject']= Coursesubject::all();
+        $data['type']=array("Basic", "Medium", "advance");
+
+        return view('admin.course.view',$data);
+      }
       public function coursedel($id){
             Course::findOrFail($id)->delete();
             return back();
@@ -110,11 +117,10 @@ class CourseController extends Controller
         return view('admin.course.edit',$data);
       }
       public function courseupdate(Request $request, $id){
-
-    $insert_data=Course::where('course_id',$id)->first();
-    $requested_data=$request->all();
-    $validation = Validator::make($request->all(),[
-            'title' => 'required|max:30',
+        $insert_data=Course::where('course_id',$id)->first();
+        $requested_data=$request->all();
+         $validation = Validator::make($request->all(),[
+            'title' => 'required|max:80',
             'details' => 'required',
             'subject_name' => 'required',
             'course_type' => 'required',
@@ -131,26 +137,61 @@ class CourseController extends Controller
         }
         else
         {
-         
-            if($request->hasFile('trainer_image'))
-            {
+            if($request->hasFile('trainer_image') or $request->hasFile('course_image'))
+            {   
+                if($request->hasFile('trainer_image')){
                 $file= $request->file('trainer_image');
+                
                 $name = time().rand(11111, 99999). '.'.$file->getClientOriginalExtension();
-                $path="admin_resource/image/member/";
+               
+                $path="admin_resource/image/trainer/";
+                
                 $fullname = $path.$name;
+                
                 $file->move($path, $fullname);
+                
                 $requested_data['trainer_image'] = $fullname;
-                 if(File::exists(asset($insert_data->trainer_image)))
+                if(File::exists(asset($insert_data->trainer_image)))
                 {
                     File::delete(asset($insert_data->trainer_image));
                 }
+                
+                }
+                else{
+                $file= $request->file('course_image');
+                
+                $name = time().rand(11111, 99999). '.'.$file->getClientOriginalExtension();
+               
+                $path="admin_resource/image/course/";
+                
+                $fullname = $path.$name;
+                
+                $file->move($path, $fullname);
+                
+                $requested_data['course_image'] = $fullname;
+                if(File::exists(asset($insert_data->course_image)))
+                {
+                    File::delete(asset($insert_data->course_image));
+                }
+                }
             }
-          
 
             $insert_data->fill($requested_data)->save();
             
-            return Redirect::to('/team');
+            return Redirect::to('/allcourse');
         }
-      }
      }
+     public function coursestatus($id){
+        $subject = Course::where('course_id',$id)->first();
+        if($subject->status == 1){
+            Course::where('course_id',$id)
+         ->update(['status'=>'0']);
+     }elseif($subject->status == 0){
+        Course::where('course_id',$id)
+         ->update(['status'=>'1']);
+     }
+         return Redirect::to('/allcourse');
+     }
+
+ }
    
